@@ -10,11 +10,11 @@ class UsersController {
     return Users;
   }
 
-  findOne = async (userId: UserId) => {
+  findOne = async (userId: UserId, field: "userId" | "email") => {
     const { data, error } = await supabase
       .from('Users')
       .select('*')
-      .eq("userId", userId)
+      .eq(field, userId)
 
     if (data?.length) {
       return data

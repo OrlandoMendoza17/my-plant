@@ -19,13 +19,13 @@ const userHandler = async (request: NextApiRequest, response: NextApiResponse) =
   try {
     const user = new UsersController()
     const method = request.method as string
-
+    // request.
     console.log('user handler')
     
     if (allowedMethods(method)) {
       
       const validatedIdFormat = UserIdSchema.parse(request.query.id)
-      const data = await user.findOne(validatedIdFormat)
+      const data = await user.findOne(validatedIdFormat, field)
       response.status(200).json(data);
 
     } else {

@@ -1,15 +1,27 @@
+import { User, UserEmail } from '@/api/schemas/User'
+import AuthService from '@/services/auth'
+import { setCookie } from '@/utils/cookies'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect, useRef } from 'react'
+import React, { FormEventHandler, useEffect, useRef, useState } from 'react'
+
+const auth = new AuthService()
 
 const Signin = () => {
 
   const router = useRouter()
-
+  
+  const [email, setEmail] = useState<UserEmail>("")
+  
   useEffect(() => {
     console.log('router', router)
   }, [])
 
+  
+  const handleSubmit: FormEventHandler<HTMLFormElement> = () => {
+    auth.login(email)
+    // setCookie("credentials", email)
+  }
 
   return (
     <main className="h-screen">
