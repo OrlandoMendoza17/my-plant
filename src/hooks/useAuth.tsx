@@ -17,7 +17,7 @@ const useAuth = (): [boolean, AuthCredentials] => {
   const [renderPage, setRenderPage] = useState<boolean>(false)
   const [credentials, setCredentials] = useState<AuthCredentials>({
     user: initializedUser,
-    token: "",
+    // token: "",
   })
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const useAuth = (): [boolean, AuthCredentials] => {
       setRenderPage(true)
 
     } else {
-      router.push("/")
+      router.push("/sign-in")
     }
   }, [])
 

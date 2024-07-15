@@ -2,6 +2,10 @@ import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { FaFaceGrinSquint, FaFaceMeh, FaFaceFrown } from "react-icons/fa6";
 import { IoIosWater } from "react-icons/io";
 import { FaPoop } from "react-icons/fa6";
+import useAuth from "@/hooks/useAuth";
+import { MdOutlineLogout } from "react-icons/md";
+import { eraseCookie } from "@/utils/cookies";
+import { useRouter } from "next/router";
 
 // import Plant0 from 
 // const inter = Inter({ subsets: ["latin"] });
@@ -30,8 +34,18 @@ const Phases = [
 
 const Home = () => {
 
+  const router = useRouter()
+  
   const [currentPhase, setCurrentPhase] = useState<number>(7)
   const $audio = useRef<HTMLAudioElement>(null)
+
+  const [renderPage, credentials] = useAuth()
+  
+  useEffect(() => {
+    if (renderPage) {
+      
+    }
+  }, [renderPage])
 
   const handleStartButton: MouseEventHandler<HTMLButtonElement> = ({ currentTarget }) => {
     console.log('currentTarget', { currentTarget })
@@ -40,6 +54,11 @@ const Home = () => {
       console.log("audio is playing")
       currentTarget.parentElement?.classList.add("!hidden")
     }
+  }
+  
+  const handleLogOut: MouseEventHandler<HTMLButtonElement> = () => {
+    eraseCookie("login")
+    router.push("/sign-in")
   }
 
   return (
@@ -57,6 +76,9 @@ const Home = () => {
           </button>
           <button className="!bg-yellow-950">
             <FaPoop size={20} />
+          </button>
+          <button onClick={handleLogOut} className="!bg-red-500">
+            <MdOutlineLogout size={20} />
           </button>
         </div>
         <div className="overlay">

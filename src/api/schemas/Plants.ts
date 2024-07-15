@@ -14,6 +14,7 @@ export const PlantIdSchema = PlantSchema.shape.plantId
 export const CreatePlantSchema = PlantSchema.omit({ plantId: true, createdAt: true })
 export const UpdatePlantSchema = PlantSchema.partial()
 
+export type Plant = z.infer<typeof PlantSchema>
 export type PlantId = z.infer<typeof PlantIdSchema>
 export type CreatePlant = z.infer<typeof CreatePlantSchema>
 export type UpdatePlant = z.infer<typeof UpdatePlantSchema>

@@ -42,7 +42,7 @@ class UsersController {
     const { userId, ...rest } = userInfo
     if (userId) {
 
-      const foundUser = await this.findOne(userId)
+      const foundUser = await this.findOne(userId, "userId")
       console.log('foundUser', foundUser)
 
       if (foundUser) {

@@ -20,5 +20,5 @@ export type UserEmail = z.infer<typeof UserEmailSchema>
 
 export type AuthCredentials = {
   user: User,
-  token: string,
+  // token: string,
 }

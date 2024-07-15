@@ -1,17 +1,113 @@
+import React, { ChangeEventHandler, FormEventHandler, useEffect, useState } from 'react'
+import { AuthCredentials, UserEmail } from '@/api/schemas/User'
+import Button from '@/components/widgets/Button'
+import NotificationModal from '@/components/widgets/NotificationModal'
+import useNotification, { OpenProps } from '@/hooks/useNotification'
+import AuthService from '@/services/auth'
+import errorMessages from '@/utils/api/errorMessages'
+import { getCookie, setCookie } from '@/utils/cookies'
+import { AxiosError } from 'axios'
 import Link from 'next/link'
-import React, { FormEventHandler } from 'react'
+import { useRouter } from 'next/router'
+import PlantService from '@/services/plants'
 
-const Signin = () => {
+const auth = new AuthService()
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = ({ currentTarget }) => {
-    const $form = new FormData(currentTarget)
-    
-    const body = {
-      name: $form.get("name"),
-      email: $form.get("email")
+const { DUPLICATED_EMAIL_NOT_ALLOWED } = errorMessages
+
+const SignUp = () => {
+
+  const router = useRouter()
+
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const [alert, handleAlert] = useNotification()
+
+  const [state, setState] = useState({
+    name: "",
+    email: "",
+  })
+
+  useEffect(() => {
+    const credentials = getCookie<AuthCredentials>("login")
+    if (!credentials) {
+
+      sessionStorage.clear()
+      localStorage.clear()
+      document.cookie = ""
+
+    } else {
+      router.push("/")
     }
-    
+  }, [])
+
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault()
+    try {
+      setLoading(true)
+      const DAYS = 10
+
+      const credentials = await auth.create(state)
+      const { user } = credentials
+      const plant = new PlantService()
+      
+      await plant.create({
+        currentPhase: 1,
+        ants: false,
+        bees: false,
+        userId: user.userId,
+        state: 'GOOD',
+      })
+      
+      handleAlert.open(({
+        type: "success",
+        title: "Creación de Planta",
+        message: `Se ha creado tu planta exitosamente"`,
+      }))
+
+      setCookie("login", credentials, DAYS)
+
+      router.push("/")
+
+    } catch (error: unknown) {
+      setLoading(false)
+
+      const duplicatedEmail: OpenProps = {
+        type: "warning",
+        title: "Correo Duplicado",
+        message: `No es posible crear un nuevo usuario con un email ya registrado"`,
+      }
+
+      const generalError: OpenProps = {
+        type: "danger",
+        title: "Error ❌",
+        message: `Ha habido un error en la creción del nuevo usuario, intentelo de nuevo"`,
+      }
+
+      let errorType = generalError
+
+      console.log('error', error)
+
+      if (error instanceof AxiosError) {
+        const { message } = error.response?.data
+        errorType = (message === DUPLICATED_EMAIL_NOT_ALLOWED) ? duplicatedEmail : generalError
+      }
+
+      handleAlert.open((errorType))
+    }
   }
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
+    const { name, value } = target
+    setState({
+      ...state,
+      [name]: value
+    })
+  }
+
+  const { name, email } = state
+  console.log('state', state)
 
   return (
     <main className="h-screen">
@@ -38,6 +134,8 @@ const Signin = () => {
                   <input
                     id="name"
                     name="name"
+                    value={name}
+                    onChange={handleChange}
                     type="text"
                     autoComplete="name"
                     placeholder="John Doe"
@@ -54,7 +152,7 @@ const Signin = () => {
                   </label>
                   <div className="text-sm">
                     <Link href="/sign-in" className="font-semibold text-emerald-600 hover:text-emerald-500">
-                      Ya tienes planta?
+                      Ya tienes tu planta?
                     </Link>
                   </div>
                 </div>
@@ -62,6 +160,8 @@ const Signin = () => {
                   <input
                     id="email"
                     name="email"
+                    value={email}
+                    onChange={handleChange}
                     type="email"
                     autoComplete="email"
                     placeholder="@myplant.com"
@@ -72,12 +172,9 @@ const Signin = () => {
               </div>
 
               <div>
-                <button
-                  type="submit"
-                  className="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-                >
+                <Button type="submit" loading={loading}>
                   Crear planta
-                </button>
+                </Button>
               </div>
             </form>
 
@@ -90,8 +187,9 @@ const Signin = () => {
           </div>
         </div>
       </>
+      <NotificationModal alertProps={[alert, handleAlert]} />
     </main>
   )
 }
 
-export default Signin
+export default SignUp
