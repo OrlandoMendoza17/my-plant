@@ -8,9 +8,9 @@ button {
   position: relative;
 
   height: 100vh;
-  display: grid;
+  // display: grid;
   // grid-template-rows: 1fr auto;
-  gap: 25px;
+  // gap: 25px;
 
   .Plant {
     background-position: center;
@@ -34,6 +34,25 @@ button {
     flex-direction: column;
     gap: 20px;
   }
+  
+  .plant{
+    height: 100%;
+  }
+  
+  .user-name{
+    @apply p-5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+    span{
+      @apply font-semibold text-base
+    }
+  }
 }
 
 .actions {
@@ -55,8 +74,12 @@ button {
 .overlay {
   z-index: 4;
   position: absolute;
-  width: 100vw;
-  height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // width: 100vw;
+  // height: 100vh;
 
   background-color: rgba($color: #000, $alpha: .5);
 

@@ -1,6 +1,7 @@
 import supabase from "@/supabase";
 import createHttpError from "http-errors";
-import { CreatePlant, PlantId, UpdatePlant } from "../schemas/Plants";
+import { CreatePlant, FindPlantByField, PlantId, UpdatePlant } from "../schemas/Plants";
+import { UserId } from "../schemas/User";
 
 class PlantsController {
   getAll = async () => {
@@ -10,11 +11,11 @@ class PlantsController {
     return Plants;
   }
 
-  findOne = async (plantId: PlantId) => {
+  findOne = async (id: UserId | PlantId, field: FindPlantByField) => {
     const { data, error } = await supabase
       .from('Plants')
       .select('*')
-      .eq("plantId", plantId)
+      .eq(field, id)
 
     if (data?.length) {
       return data
@@ -23,7 +24,7 @@ class PlantsController {
       throw createHttpError.NotFound("Plant not found!")
     }
   }
-
+  
   create = async (plantInfo: CreatePlant) => {
     console.log('plantInfo', plantInfo)
     const { data, error } = await supabase.from('Plants')
@@ -42,7 +43,7 @@ class PlantsController {
     const { plantId, ...rest } = plantInfo
     if (plantId) {
 
-      const foundPlant = await this.findOne(plantId)
+      const foundPlant = await this.findOne(plantId, "plantId")
       console.log('foundPlant', foundPlant)
 
       if (foundPlant) {
