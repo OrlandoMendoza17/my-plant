@@ -2,14 +2,16 @@ import { CSSProperties, MouseEventHandler, useEffect, useRef, useState } from "r
 import { FaFaceGrinSquint, FaFaceMeh, FaFaceFrown } from "react-icons/fa6";
 import { IoIosWater } from "react-icons/io";
 import { FaPoop } from "react-icons/fa6";
+import { LuRefreshCcw } from "react-icons/lu";
 import useAuth from "@/hooks/useAuth";
 import { MdOutlineLogout } from "react-icons/md";
 import { eraseCookie } from "@/utils/cookies";
 import { useRouter } from "next/router";
 import PlantService from "@/services/plants";
-import { frequencyTypes, Plant } from "@/api/schemas/Plants";
+import { frequencyTypes, Plant, PlantPhase } from "@/api/schemas/Plants";
 import { FaUserCircle } from "react-icons/fa";
 import CronJobService from "@/services/cron-jobs";
+import useNotification from "@/hooks/useNotification";
 
 // import Plant0 from 
 // const inter = Inter({ subsets: ["latin"] });
@@ -49,7 +51,11 @@ const Home = () => {
   const $image = useRef<HTMLImageElement>(null)
   const $audio = useRef<HTMLAudioElement>(null)
 
+  const [rendered, setRendered] = useState<boolean>(false)
+
   const [renderPage, credentials] = useAuth()
+
+  const [alert, handleAlert] = useNotification()
 
   const [fases, setFases] = useState<Fases[]>([
     {
@@ -187,39 +193,64 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
-      if (renderPage) {
+      if (renderPage && !rendered) {
+        setRendered(true)
+        const ONE_SECOND = 1000
 
         const { userId } = credentials.user
         const service = new PlantService()
 
-        const plant = await service.findOne(userId, "userId")
-        setPlant(plant)
+        console.log("Fetched")
+
+        setInterval(async () => {
+          try {
+            const plant = await service.findOne(userId, "userId")
+            setPlant(plant)
+          } catch (error) {
+            console.log('error', error)
+            handleAlert.open({
+              type: "danger",
+              title: "Error ❌",
+              message: `Ha ocurrido un error actualizando la información de la planta, intentelo de nuevo`,
+            })
+          }
+        }, 10 * ONE_SECOND)
+
       }
     })()
   }, [renderPage])
 
   useEffect(() => {
     (async () => {
-      if (!ants.length) {
-        const updatedPlant = await plantService.update({
-          ...plant,
-          ants: false,
-        })
+      try {
+        if (!ants.length) {
+          const updatedPlant = await plantService.update({
+            ...plant,
+            ants: false,
+          })
 
-        setPlant(updatedPlant)
-        console.log("correr cron-job")
-        
-        job.create.watering({
-          jobInfo: {
-            user: {
-              name: user.name,
-              email: user.email,
+          setPlant(updatedPlant)
+          console.log("correr cron-job")
+
+          job.create.watering({
+            jobInfo: {
+              user: {
+                name: user.name,
+                email: user.email,
+              },
+              jobName: `watering-${user.email}`,
+              frequencyTime: '5-seconds',
+              // frequencyTime: plant.frequency,
             },
-            jobName: `watering-${user.email}`,
-            frequencyTime: '5-seconds',
-            // frequencyTime: plant.frequency,
-          },
-          plantId,
+            plantId,
+          })
+        }
+      } catch (error) {
+        console.log('error', error)
+        handleAlert.open({
+          type: "danger",
+          title: "Error ❌",
+          message: `Ha ocurrido un error actualizando la información de la planta, intentelo de nuevo`,
         })
       }
     })()
@@ -228,10 +259,56 @@ const Home = () => {
   const handleStartButton: MouseEventHandler<HTMLButtonElement> = ({ currentTarget }) => {
     console.log('currentTarget', { currentTarget })
     if ($audio.current) {
-      // $audio.current.play()
+      $audio.current.play()
       console.log("audio is playing")
       currentTarget.parentElement?.classList.add("!hidden")
     }
+  }
+
+  const handleResetPlant: MouseEventHandler<HTMLButtonElement> = async () => {
+    try {
+      const updatedPlant = {
+        ...plant,
+        currentPhase: 0 as PlantPhase,
+        ants: false,
+      }
+      setPlant(updatedPlant)
+      await plantService.update(updatedPlant)
+    } catch (error) {
+      console.log('error', error)
+      handleAlert.open({
+        type: "danger",
+        title: "Error ❌",
+        message: `Ha ocurrido un error actualizando la información de la planta, intentelo de nuevo`,
+      })
+    }
+  }
+
+  const handlePlantSeed: MouseEventHandler<HTMLButtonElement> = () => {
+    setPlant({
+      ...plant,
+      currentPhase: 1,
+      ants: false,
+    })
+
+    setTimeout(async () => {
+      try {
+        const updatedPlant = {
+          ...plant,
+          currentPhase: 2 as PlantPhase,
+          ants: true,
+        }
+        setPlant(updatedPlant)
+        await plantService.update(updatedPlant)
+      } catch (error) {
+        console.log('error', error)
+        handleAlert.open({
+          type: "danger",
+          title: "Error ❌",
+          message: `Ha ocurrido un error actualizando la información de la planta, intentelo de nuevo`,
+        })
+      }
+    }, 1000);
   }
 
   const handleLogOut: MouseEventHandler<HTMLButtonElement> = () => {
@@ -249,12 +326,21 @@ const Home = () => {
           </div>
 
           <div className="actions">
-            {/* <button>
-              <IoIosWater size={20} />
-            </button> */}
-            <button className="!bg-yellow-950">
+            {
+              plant.currentPhase > 1 &&
+              <button onClick={handleResetPlant} className="!bg-sky-500">
+                <LuRefreshCcw size={20} />
+              </button>
+            }
+            {
+              plant.currentPhase === 0 &&
+              <button onClick={handlePlantSeed} className="!bg-green-500">
+                <IoIosWater size={20} />
+              </button>
+            }
+            {/* <button className="!bg-yellow-950">
               <FaPoop size={20} />
-            </button>
+            </button> */}
             <button onClick={handleLogOut} className="!bg-red-500">
               <MdOutlineLogout size={20} />
             </button>

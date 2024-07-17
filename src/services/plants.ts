@@ -12,6 +12,7 @@ class PlantService{
     return data;
   }
   update = async (plantInfo: UpdatePlant) => {
+    debugger
     const { data } = await API.put<Plant[]>(`/api/plants`, plantInfo)
     return data[0];
   }
