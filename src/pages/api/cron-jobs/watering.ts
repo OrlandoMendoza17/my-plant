@@ -34,7 +34,7 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
     console.log(`The job "${jobName}" executed at ${frequencyTime}`);
 
     const foundPlant = await plant.findOne(plantId, "plantId")
-    
+
     if (foundPlant.currentPhase < 7) {
 
       const ZERO_PHASE = 0
@@ -91,12 +91,13 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
       }
 
       const result = await apiInstance.sendTransacEmail(sendSmtpEmail)
-      // console.log('result', result)
+      console.log('result', result)
+      console.log("Se envió el correo de regado 🚿")
 
     }
-    
+
     await jobService.stop(jobName)
-    
+
     await jobService.create.ants({
       jobInfo: {
         user,

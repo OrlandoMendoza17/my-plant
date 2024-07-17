@@ -69,6 +69,7 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
 
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail)
     // console.log('result', result)
+    console.log("Se envió el correo de bachacos 🐜")
 
     await jobService.stop(jobName)
 
