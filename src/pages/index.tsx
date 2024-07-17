@@ -239,8 +239,8 @@ const Home = () => {
                 email: user.email,
               },
               jobName: `watering-${user.email}`,
-              frequencyTime: '5-seconds',
-              // frequencyTime: plant.frequency,
+              frequencyTime: plant.frequency,
+              // frequencyTime: '5-seconds',
             },
             plantId,
           })
