@@ -274,6 +274,7 @@ const Home = () => {
                 //   left: `${($image.current as HTMLImageElement).width * left}%`,
                 //   bottom: `${($image.current as HTMLImageElement).height * bottom}%`,
                 // }}
+                key={indexAnt}
                 style={styles}
                 onClick={() => {
                   const modifiedFases = [...fases]
