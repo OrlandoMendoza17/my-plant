@@ -1,4 +1,4 @@
-import { CreatePlant, FindPlantByField, Plant, PlantId } from "@/api/schemas/Plants"
+import { CreatePlant, FindPlantByField, Plant, PlantId, UpdatePlant } from "@/api/schemas/Plants"
 import API from "./api"
 import { UserId } from "@/api/schemas/User";
 
@@ -10,6 +10,10 @@ class PlantService{
   create = async (plantInfo: CreatePlant) => {
     const { data } = await API.post<Plant[]>(`/api/plants`, plantInfo)
     return data;
+  }
+  update = async (plantInfo: UpdatePlant) => {
+    const { data } = await API.put<Plant[]>(`/api/plants`, plantInfo)
+    return data[0];
   }
 }
 

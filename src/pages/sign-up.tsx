@@ -10,10 +10,13 @@ import { AxiosError } from 'axios'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import PlantService from '@/services/plants'
+import { frequencyTypes, PlantFrequency } from '@/api/schemas/Plants'
 
 const auth = new AuthService()
 
 const { DUPLICATED_EMAIL_NOT_ALLOWED } = errorMessages
+
+const { FIVE_MINUTES, FIFTEEN_DAYS, THIRTY_DAYS } = frequencyTypes
 
 const SignUp = () => {
 
@@ -47,19 +50,24 @@ const SignUp = () => {
     try {
       setLoading(true)
       const DAYS = 10
+      
+      const $form = new FormData(event.currentTarget) 
+      
+      const frequency = $form.get("frequency") as PlantFrequency
 
       const credentials = await auth.create(state)
       const { user } = credentials
       const plant = new PlantService()
-      
+      debugger
       await plant.create({
-        currentPhase: 1,
-        ants: false,
+        currentPhase: 0,
+        ants: true,
         bees: false,
         userId: user.userId,
         state: 'GOOD',
+        frequency,
       })
-      
+
       handleAlert.open(({
         type: "success",
         title: "Creación de Planta",
@@ -90,7 +98,7 @@ const SignUp = () => {
       console.log('error', error)
 
       if (error instanceof AxiosError) {
-        const { message } = error.response?.data
+        const message = error.response?.data?.message
         errorType = (message === DUPLICATED_EMAIL_NOT_ALLOWED) ? duplicatedEmail : generalError
       }
 
@@ -115,8 +123,9 @@ const SignUp = () => {
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img
-              className="mx-auto h-14 w-auto"
-              src="https://d1nhio0ox7pgb.cloudfront.net/_img/g_collection_png/standard/512x512/plant.png"
+              className="mx-auto h-32 w-auto"
+              // src="https://d1nhio0ox7pgb.cloudfront.net/_img/g_collection_png/standard/512x512/plant.png"
+              src="https://jtnrmwagncsharindxpw.supabase.co/storage/v1/object/public/my-plant-storage/logo-recortado.png"
               alt="Your Company"
             />
             <h2 className="mt-8 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -168,6 +177,26 @@ const SignUp = () => {
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm sm:leading-6"
                   />
+                </div>
+              </div>
+
+              <div>
+                <span className="block text-sm font-medium leading-6 text-gray-900 pb-3">
+                  Frecuencia de Crecimiento
+                </span>
+                <div className="flex gap-4">
+                  <label htmlFor="option-1" className="flex items-center gap-3">
+                    <input id="option-1" value={FIVE_MINUTES} type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
+                    <span>5 minutos</span>
+                  </label>
+                  <label htmlFor="option-2" className="flex items-center gap-3">
+                    <input id="option-2" value={FIFTEEN_DAYS} type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
+                    <span>15 días</span>
+                  </label>
+                  <label htmlFor="option-3" className="flex items-center gap-3">
+                    <input id="option-3" value={THIRTY_DAYS} type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
+                    <span>30 días</span>
+                  </label>
                 </div>
               </div>
 

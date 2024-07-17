@@ -7,8 +7,9 @@ import { MdOutlineLogout } from "react-icons/md";
 import { eraseCookie } from "@/utils/cookies";
 import { useRouter } from "next/router";
 import PlantService from "@/services/plants";
-import { Plant } from "@/api/schemas/Plants";
+import { frequencyTypes, Plant } from "@/api/schemas/Plants";
 import { FaUserCircle } from "react-icons/fa";
+import CronJobService from "@/services/cron-jobs";
 
 // import Plant0 from 
 // const inter = Inter({ subsets: ["latin"] });
@@ -26,135 +27,20 @@ import { FaUserCircle } from "react-icons/fa";
 
 const base_url = "https://jtnrmwagncsharindxpw.supabase.co/storage/v1/object/public/my-plant-storage"
 
+const plantService = new PlantService()
+const job = new CronJobService()
+
 type Fases = {
   image: string,
   ants: CSSProperties[],
 }
 
 // CSSProperties
-
-const fase = 6
+const { FIFTEEN_DAYS } = frequencyTypes
+// const fase = 6
 
 const imageSize = 9
 const imageHalfSize = `${imageSize / 2}vh`
-
-const fases: Fases[] = [
-  {
-    image: "0.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} + 1vh)`,
-        bottom: `calc(5vh - ${imageHalfSize})`,
-      },
-    ],
-  },
-  {
-    image: "1.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} - 1vh)`,
-        bottom: `calc(5vh - ${imageHalfSize})`,
-      },
-    ],
-  },
-  {
-    image: "2.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} + 5vh)`,
-        bottom: `calc(7vh - ${imageHalfSize})`,
-      },
-    ],
-  },
-  {
-    image: "3.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} - 1vh)`,
-        bottom: `calc(26vh - ${imageHalfSize})`,
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 9vh)`,
-        bottom: `calc(7vh - ${imageHalfSize})`,
-      },
-    ],
-  },
-  {
-    image: "4.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} - 1vh)`,
-        bottom: `calc(26vh - ${imageHalfSize})`,
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 9vh)`,
-        bottom: `calc(7vh - ${imageHalfSize})`,
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 2vh)`,
-        bottom: `calc(35vh - ${imageHalfSize})`,
-        transform: "rotateY(180deg)"
-      },
-    ],
-  },
-  {
-    image: "5.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} - 1vh)`,
-        bottom: `calc(30vh - ${imageHalfSize})`,
-        transform: "rotate(20deg)"
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 9vh)`,
-        bottom: `calc(7vh - ${imageHalfSize})`,
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 6vh)`,
-        bottom: `calc(35vh - ${imageHalfSize})`,
-        transform: "rotateY(180deg)"
-      },
-    ],
-  },
-  {
-    image: "6.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} - 4vh)`,
-        bottom: `calc(40vh - ${imageHalfSize})`,
-        transform: "rotate(20deg)"
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 9vh)`,
-        bottom: `calc(7vh - ${imageHalfSize})`,
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 7vh)`,
-        bottom: `calc(30vh - ${imageHalfSize})`,
-        transform: "rotateY(180deg) rotate(20deg)"
-      },
-    ],
-  },
-  {
-    image: "7.png",
-    ants: [
-      {
-        left: `calc(50vw - ${imageHalfSize} + 9vh)`,
-        bottom: `calc(7vh - ${imageHalfSize})`,
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 1vh)`,
-        bottom: `calc(38vh - ${imageHalfSize})`,
-        transform: "rotateY(180deg) rotate(-30deg)"
-      },
-      {
-        left: `calc(50vw - ${imageHalfSize} + 0vh)`,
-        bottom: `calc(58vh - ${imageHalfSize})`,
-        transform: "rotate(-40deg)"
-      },
-    ],
-  },
-]
 
 const Home = () => {
 
@@ -165,7 +51,123 @@ const Home = () => {
 
   const [renderPage, credentials] = useAuth()
 
-  const { user } = credentials
+  const [fases, setFases] = useState<Fases[]>([
+    {
+      image: "0.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} + 1vh)`,
+          bottom: `calc(5vh - ${imageHalfSize})`,
+        },
+      ],
+    },
+    {
+      image: "1.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} - 1vh)`,
+          bottom: `calc(5vh - ${imageHalfSize})`,
+        },
+      ],
+    },
+    {
+      image: "2.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} + 5vh)`,
+          bottom: `calc(7vh - ${imageHalfSize})`,
+        },
+      ],
+    },
+    {
+      image: "3.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} - 1vh)`,
+          bottom: `calc(26vh - ${imageHalfSize})`,
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 9vh)`,
+          bottom: `calc(7vh - ${imageHalfSize})`,
+        },
+      ],
+    },
+    {
+      image: "4.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} - 1vh)`,
+          bottom: `calc(26vh - ${imageHalfSize})`,
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 9vh)`,
+          bottom: `calc(7vh - ${imageHalfSize})`,
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 2vh)`,
+          bottom: `calc(35vh - ${imageHalfSize})`,
+          transform: "rotateY(180deg)"
+        },
+      ],
+    },
+    {
+      image: "5.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} - 1vh)`,
+          bottom: `calc(30vh - ${imageHalfSize})`,
+          transform: "rotate(20deg)"
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 9vh)`,
+          bottom: `calc(7vh - ${imageHalfSize})`,
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 6vh)`,
+          bottom: `calc(35vh - ${imageHalfSize})`,
+          transform: "rotateY(180deg)"
+        },
+      ],
+    },
+    {
+      image: "6.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} - 4vh)`,
+          bottom: `calc(40vh - ${imageHalfSize})`,
+          transform: "rotate(20deg)"
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 9vh)`,
+          bottom: `calc(7vh - ${imageHalfSize})`,
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 7vh)`,
+          bottom: `calc(30vh - ${imageHalfSize})`,
+          transform: "rotateY(180deg) rotate(20deg)"
+        },
+      ],
+    },
+    {
+      image: "7.png",
+      ants: [
+        {
+          left: `calc(50vw - ${imageHalfSize} + 9vh)`,
+          bottom: `calc(7vh - ${imageHalfSize})`,
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 1vh)`,
+          bottom: `calc(38vh - ${imageHalfSize})`,
+          transform: "rotateY(180deg) rotate(-30deg)"
+        },
+        {
+          left: `calc(50vw - ${imageHalfSize} + 0vh)`,
+          bottom: `calc(58vh - ${imageHalfSize})`,
+          transform: "rotate(-40deg)"
+        },
+      ],
+    },
+  ])
 
   const [plant, setPlant] = useState<Plant>({
     plantId: "",
@@ -174,8 +176,14 @@ const Home = () => {
     bees: false,
     userId: "",
     state: "GOOD",
+    frequency: FIFTEEN_DAYS,
     createdAt: "",
   })
+
+  const { plantId } = plant
+
+  const { user } = credentials
+  const { image, ants } = fases[plant.currentPhase]
 
   useEffect(() => {
     (async () => {
@@ -185,13 +193,37 @@ const Home = () => {
         const service = new PlantService()
 
         const plant = await service.findOne(userId, "userId")
-        setPlant({
-          ...plant,
-          currentPhase: fase,
-        })
+        setPlant(plant)
       }
     })()
   }, [renderPage])
+
+  useEffect(() => {
+    (async () => {
+      if (!ants.length) {
+        const updatedPlant = await plantService.update({
+          ...plant,
+          ants: false,
+        })
+
+        setPlant(updatedPlant)
+        console.log("correr cron-job")
+        
+        job.create.watering({
+          jobInfo: {
+            user: {
+              name: user.name,
+              email: user.email,
+            },
+            jobName: `watering-${user.email}`,
+            frequencyTime: '5-seconds',
+            // frequencyTime: plant.frequency,
+          },
+          plantId,
+        })
+      }
+    })()
+  }, [ants])
 
   const handleStartButton: MouseEventHandler<HTMLButtonElement> = ({ currentTarget }) => {
     console.log('currentTarget', { currentTarget })
@@ -206,8 +238,6 @@ const Home = () => {
     eraseCookie("login")
     router.push("/sign-in")
   }
-
-  const { image, ants } = fases[plant.currentPhase]
 
   return (
     (user && plant) ?
@@ -234,7 +264,8 @@ const Home = () => {
 
           {
             $image.current &&
-            ants.map((styles) =>
+            plant.ants &&
+            ants.map((styles, indexAnt) =>
               <img
                 className="bachaco"
                 // width={40}
@@ -244,20 +275,20 @@ const Home = () => {
                 //   bottom: `${($image.current as HTMLImageElement).height * bottom}%`,
                 // }}
                 style={styles}
-                onResize={() => {
-                  console.log("Hola")
+                onClick={() => {
+                  const modifiedFases = [...fases]
+                  const modifiedAnts = ants.filter((ant, index) => indexAnt !== index)
+                  modifiedFases[plant.currentPhase].ants = modifiedAnts
+                  setFases(modifiedFases)
                 }}
-                // src={`${base_url}/bachaco.webp`}
-                src={`https://images.vexels.com/media/users/3/312193/isolated/preview/27837f45221dd465567ad49ac507bc51-hormiga-trabajadora.png`}
-                onClick={() => alert("Hello")}
+                src={`${base_url}/bachaco.webp`}
               />
             )
           }
 
           <div className="plant-state">
-            <FaFaceGrinSquint size={40} className="fill-emerald-500" />
-            <FaFaceMeh size={40} className="fill-gray-500" />
-            <FaFaceFrown size={40} className="fill-gray-500" />
+            <FaFaceGrinSquint size={40} className={!plant.ants ? "fill-emerald-500" : "fill-gray-500"} />
+            <FaFaceFrown size={40} className={plant.ants ? "fill-red-500" : "fill-gray-500"} />
           </div>
 
           <div className="overlay">

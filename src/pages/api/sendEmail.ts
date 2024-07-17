@@ -2,10 +2,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const brevo = require('@getbrevo/brevo')
 
-const BREVO_EMAIL_KEY = process.env.BREVO_EMAIL_KEY
+const BREVO_EMAIL_KEY = process.env.BREVO_EMAIL_KEY || ""
+
+const base_url = "https://jtnrmwagncsharindxpw.supabase.co/storage/v1/object/public/my-plant-storage"
 
 const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   try {
+    const user = request.body
+    
     const apiInstance = new brevo.TransactionalEmailsApi();
 
     apiInstance.setApiKey(
@@ -15,24 +19,22 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
 
     let sendSmtpEmail = new brevo.SendSmtpEmail();
 
-    sendSmtpEmail.subject = "Hola 😎"
-    sendSmtpEmail.to = [
-      { email: "alexanderrojas15121098@gmail.com", name: "Alexander Rojas" },
-      { email: "nj13072004@gmail.com", name: "Jesus Ninin" },
-    ]
+    sendSmtpEmail.subject = "Llegaron Bachacos a tu planta 🐜"
+    sendSmtpEmail.to = [user]
+    // { email: "marietsy.911.mm@gmail.com", name: "Marietsy Mendoza" },
 
     sendSmtpEmail.htmlContent = `
       <html>
         <body>
-          <h1>Hola, aquí probando desde Brevo</h1>
+          <h1>Un enjambre de bachacos están atacando tu planta. Pronto elimínalas ❗❗</h1>
           <hr />
-          <img src="https://scontent.fmyc2-1.fna.fbcdn.net/v/t31.18172-8/1399766_863304847019692_7138271758297674211_o.jpg?_nc_cat=102&ccb=1-7&_nc_sid=f798df&_nc_ohc=8uxf2ksAGpUQ7kNvgGT3zwm&_nc_ht=scontent.fmyc2-1.fna&oh=00_AYAj9HoUAzZ-V4Im2peXGldZsvNV3JBjDQ-oTyx0jiIuBA&oe=66AD1DAC"/>
+          <img src="${base_url}/bachaco.webp"/>
         </body>
       </html>
     `
 
     sendSmtpEmail.sender = {
-      name: "Desde Heinz",
+      name: "My Plant 🌱",
       email: "ommv.17@gmail.com"
     }
 

@@ -74,7 +74,7 @@ const Signin = () => {
       console.log('error', error)
 
       if (error instanceof AxiosError) {
-        const { message } = error.response?.data
+        const message = error.response?.data?.message
         errorMessage = (message === NOT_FOUND_USER) ? notFoundMessage : generalMessage
       }
       
@@ -95,8 +95,9 @@ const Signin = () => {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
-            className="mx-auto h-14 w-auto"
-            src="https://d1nhio0ox7pgb.cloudfront.net/_img/g_collection_png/standard/512x512/plant.png"
+            className="mx-auto h-32 w-auto"
+            // src="https://d1nhio0ox7pgb.cloudfront.net/_img/g_collection_png/standard/512x512/plant.png"
+            src="https://jtnrmwagncsharindxpw.supabase.co/storage/v1/object/public/my-plant-storage/logo-recortado.png"
             alt="Your Company"
           />
           <h2 className="mt-8 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">

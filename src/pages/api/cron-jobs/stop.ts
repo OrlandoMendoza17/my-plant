@@ -9,7 +9,7 @@ type BodyProps = {
 const handler = (request: NextApiRequest, response: NextApiResponse) => {
   try {
 
-    const { taskName }: BodyProps = request.body
+    const taskName = request.query.taskName
     const tasks = cron.getTasks();
 
     const array = Array.from(tasks.entries()).map(([key, value]) => {
