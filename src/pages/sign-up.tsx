@@ -58,7 +58,7 @@ const SignUp = () => {
       const credentials = await auth.create(state)
       const { user } = credentials
       const plant = new PlantService()
-      debugger
+      
       await plant.create({
         currentPhase: 0,
         ants: true,
@@ -186,15 +186,15 @@ const SignUp = () => {
                 </span>
                 <div className="flex gap-4">
                   <label htmlFor="option-1" className="flex items-center gap-3">
-                    <input id="option-1" value={FIVE_MINUTES} type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
+                    <input id="option-1" value="FIVE_MINUTES" type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
                     <span>5 minutos</span>
                   </label>
                   <label htmlFor="option-2" className="flex items-center gap-3">
-                    <input id="option-2" value={FIFTEEN_DAYS} type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
+                    <input id="option-2" value="FIFTEEN_DAYS" type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
                     <span>15 días</span>
                   </label>
                   <label htmlFor="option-3" className="flex items-center gap-3">
-                    <input id="option-3" value={THIRTY_DAYS} type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
+                    <input id="option-3" value="THIRTY_DAYS" type="radio" name="frequency" className="text-emerald-500 !ring-emerald-500" />
                     <span>30 días</span>
                   </label>
                 </div>

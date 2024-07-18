@@ -1,29 +1,28 @@
 import { z } from 'zod'
 
+const ONE_SECOND = 1000
+const ONE_MINUTE = 60 * ONE_SECOND
+const FIVE_MINUTES = 5 * ONE_MINUTE
+
+const ONE_HOUR = 60 * ONE_MINUTE
+const ONE_DAY = 24 * ONE_HOUR
+const FIFTEEN_DAYS = 15 * ONE_DAY
+const THIRTY_DAYS = 30 * ONE_DAY
+
 export const frequencyTypes = {
-  FIVE_SECONDS: "5-seconds",
-  ONE_MINUTE: "1-minute",
-  FIVE_MINUTES: "5-minutes",
-  FIFTEEN_DAYS: "15-days",
-  THIRTY_DAYS: "30-days",
-}
-
-const { FIVE_SECONDS, ONE_MINUTE, FIVE_MINUTES, FIFTEEN_DAYS, THIRTY_DAYS } = frequencyTypes
-
-export const frequency = {
-  [FIVE_SECONDS]: "*/5 * * * * *",
-  [ONE_MINUTE]: "*/1 * * * *",
-  [FIVE_MINUTES]: "*/5 * * * *",
-  [FIFTEEN_DAYS]: "0 0 1,16 * *",
-  [THIRTY_DAYS]: "0 0 1 * *",
+  FIVE_SECONDS: 5 * ONE_SECOND,
+  ONE_MINUTE: ONE_MINUTE,
+  FIVE_MINUTES: FIVE_MINUTES,
+  FIFTEEN_DAYS: FIFTEEN_DAYS,
+  THIRTY_DAYS: THIRTY_DAYS,
 }
 
 export const PlantFrequencySchema = z.union([
-  z.literal(FIVE_SECONDS),
-  z.literal(ONE_MINUTE),
-  z.literal(FIVE_MINUTES),
-  z.literal(FIFTEEN_DAYS),
-  z.literal(THIRTY_DAYS)
+  z.literal("FIVE_SECONDS"),
+  z.literal("ONE_MINUTE"),
+  z.literal("FIVE_MINUTES"),
+  z.literal("FIFTEEN_DAYS"),
+  z.literal("THIRTY_DAYS")
 ])
 
 export type PlantFrequency = z.infer<typeof PlantFrequencySchema>

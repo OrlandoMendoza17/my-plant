@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import cron from "node-cron";
 import { CreateCronJob, CreateCronJobSchema } from "@/api/schemas/CronJobs";
-import { frequency, PlantId } from "@/api/schemas/Plants";
+import { frequencyTypes, PlantId } from "@/api/schemas/Plants";
 import PlantService from "@/services/plants";
 import CronJobService from "@/services/cron-jobs";
 
@@ -25,7 +25,7 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
 
   const base_url = "https://jtnrmwagncsharindxpw.supabase.co/storage/v1/object/public/my-plant-storage"
 
-  cron.schedule(frequency[frequencyTime], async () => {
+  setTimeout(async () => {
     
     const plant = new PlantService()
     const jobService = new CronJobService()
@@ -71,9 +71,9 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
     // console.log('result', result)
     console.log("Se envió el correo de bachacos 🐜")
 
-    await jobService.stop(jobName)
+    // await jobService.stop(jobName)
 
-  }, cronConfig)
+  }, frequencyTypes[frequencyTime])
 
   response.status(200).json({ message: "successfull" });
 }
