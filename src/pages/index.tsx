@@ -12,6 +12,7 @@ import { frequencyTypes, Plant, PlantPhase } from "@/api/schemas/Plants";
 import { FaUserCircle } from "react-icons/fa";
 import CronJobService from "@/services/cron-jobs";
 import useNotification from "@/hooks/useNotification";
+import { UserId } from "@/api/schemas/User";
 
 // import Plant0 from 
 // const inter = Inter({ subsets: ["latin"] });
@@ -43,6 +44,8 @@ const { FIFTEEN_DAYS } = frequencyTypes
 
 const imageSize = 9
 const imageHalfSize = `${imageSize / 2}vh`
+
+const service = new PlantService()
 
 const Home = () => {
 
@@ -182,7 +185,7 @@ const Home = () => {
     bees: false,
     userId: "",
     state: "GOOD",
-    frequency: FIFTEEN_DAYS,
+    frequency: "FIFTEEN_DAYS",
     createdAt: "",
   })
 
@@ -198,22 +201,12 @@ const Home = () => {
         const ONE_SECOND = 1000
 
         const { userId } = credentials.user
-        const service = new PlantService()
+        updateStatus(userId)
 
         console.log("Fetched")
 
         setInterval(async () => {
-          try {
-            const plant = await service.findOne(userId, "userId")
-            setPlant(plant)
-          } catch (error) {
-            console.log('error', error)
-            handleAlert.open({
-              type: "danger",
-              title: "Error ❌",
-              message: `Ha ocurrido un error actualizando la información de la planta, intentelo de nuevo`,
-            })
-          }
+          updateStatus(userId)
         }, 10 * ONE_SECOND)
 
       }
@@ -256,6 +249,20 @@ const Home = () => {
     })()
   }, [ants])
 
+  const updateStatus = async (userId: UserId) => {
+    try {
+      const plant = await service.findOne(userId, "userId")
+      setPlant(plant)
+    } catch (error) {
+      console.log('error', error)
+      handleAlert.open({
+        type: "danger",
+        title: "Error ❌",
+        message: `Ha ocurrido un error actualizando la información de la planta, intentelo de nuevo`,
+      })
+    }
+  }
+  
   const handleStartButton: MouseEventHandler<HTMLButtonElement> = ({ currentTarget }) => {
     console.log('currentTarget', { currentTarget })
     if ($audio.current) {
