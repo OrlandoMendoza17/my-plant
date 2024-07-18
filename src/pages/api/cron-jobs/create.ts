@@ -1,5 +1,4 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { frequency } from "@/api/schemas/Plants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import cron from "node-cron";
 const brevo = require('@getbrevo/brevo')
@@ -24,7 +23,7 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
 
   let sendSmtpEmail = new brevo.SendSmtpEmail();
 
-  cron.schedule(frequency[frequencyTime], async () => {
+  // cron.schedule(frequency[frequencyTime], async () => {
 
     console.log(`The job "${name}" at every ${frequencyTime}`);
 
@@ -52,7 +51,7 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
     // const result = await apiInstance.sendTransacEmail(sendSmtpEmail)
     // console.log('result', result)
     
-  }, cronConfig)
+  // }, cronConfig)
 
   response.status(200).json({ message: "successfull" });
 }
