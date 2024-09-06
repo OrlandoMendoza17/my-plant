@@ -3,8 +3,11 @@ import PlantsController from "@/api/controllers/plants.controller";
 import { errorHandler } from "@/api/middleware/errorHandler";
 import { FindPlantByFieldSchema, PlantIdSchema } from "@/api/schemas/Plants";
 import { UserIdSchema } from "@/api/schemas/User";
+import status from "http-status";
 import createHttpError from "http-errors";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+const { OK } = status
 
 const allowedMethods = (method: string) => {
   const HTTP_METHODS = [
@@ -31,9 +34,9 @@ const plantHandler = async (request: NextApiRequest, response: NextApiResponse) 
 
         const validatedIdFormat = PlantIdSchema.parse(id)
         const validatedFieldFormat = FindPlantByFieldSchema.parse(field)
-        
+
         const data = await plant.findOne(validatedIdFormat, validatedFieldFormat)
-        response.status(200).json(data);
+        response.status(OK).json(data);
       }
 
     } else {

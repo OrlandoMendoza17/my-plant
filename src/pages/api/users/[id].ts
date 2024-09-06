@@ -2,10 +2,13 @@
 import UsersController from "@/api/controllers/users.controller";
 import { errorHandler } from "@/api/middleware/errorHandler";
 import { CreateUserSchema, UserEmailSchema, UserIdSchema } from "@/api/schemas/User";
+import status from "http-status";
 import createHttpError from "http-errors";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type ValidField = "userId" | "email"
+
+const { OK } = status
 
 const allowedMethods = (method: string) => {
   const HTTP_METHODS = [
@@ -40,12 +43,12 @@ const userHandler = async (request: NextApiRequest, response: NextApiResponse) =
         userId: UserIdSchema,
         email: UserEmailSchema,
       }
-      
+
       const Schema = getSchema[field]
 
       const validatedIdFormat = Schema.parse(request.query.id)
       const data = await user.findOne(validatedIdFormat, field)
-      response.status(200).json(data);
+      response.status(OK).json(data);
 
     } else {
       throw new createHttpError.MethodNotAllowed("Bad Request!")
