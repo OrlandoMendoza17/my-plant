@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import cron from "node-cron";
 import { CreateCronJob, CreateCronJobSchema } from "@/api/schemas/CronJobs";
-import { frequency, frequencyTypes, PlantId, PlantPhase } from "@/api/schemas/Plants";
+import { frequencyTypes, PlantId, PlantPhase } from "@/api/schemas/Plants";
 import PlantService from "@/services/plants";
 import CronJobService from "@/services/cron-jobs";
 const brevo = require('@getbrevo/brevo')
@@ -14,8 +14,6 @@ type BodyProps = {
   plantId: PlantId,
 }
 
-const { ONE_MINUTE } = frequencyTypes
-
 const handler = (request: NextApiRequest, response: NextApiResponse) => {
 
   const { jobInfo, plantId }: BodyProps = request.body
@@ -26,7 +24,7 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
 
   const base_url = "https://jtnrmwagncsharindxpw.supabase.co/storage/v1/object/public/my-plant-storage"
 
-  cron.schedule(frequency[frequencyTime], async () => {
+  setTimeout(async () => {
 
     const plant = new PlantService()
     const jobService = new CronJobService()
@@ -96,17 +94,18 @@ const handler = (request: NextApiRequest, response: NextApiResponse) => {
 
     }
 
-    await jobService.stop(jobName)
+    // await jobService.stop(jobName)
 
     await jobService.create.ants({
       jobInfo: {
         user,
         jobName: `ants-${user.email}`,
-        frequencyTime: ONE_MINUTE,
+        frequencyTime: "ONE_MINUTE",
       },
       plantId,
     })
-  }, cronConfig)
+    
+  }, frequencyTypes[frequencyTime])
 
   response.status(200).json({ message: "successfull" });
 }

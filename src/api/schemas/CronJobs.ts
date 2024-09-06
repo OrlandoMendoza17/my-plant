@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { frequency, PlantFrequencySchema } from "./Plants"
+import { PlantFrequencySchema } from "./Plants"
 
 export const CreateCronJobSchema = z.object({
   user: z.object({
